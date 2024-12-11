@@ -22,6 +22,6 @@ namespace StudentManagementAPI.Models
         public string Password { get; set; }
 
         // Navigation property: one-to-many 
-        public ICollection<Course> Courses { get; set; }
+        public ICollection<Course>? Courses { get; set; } 
     }
 }
