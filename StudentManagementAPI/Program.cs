@@ -21,8 +21,6 @@ builder.Services.AddSwaggerGen(c =>
         });
     });
 
-var app = builder.Build();
-
 // adding connection to database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -31,6 +29,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         new MySqlServerVersion(new Version(8, 0, 0))
     );
 });
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
