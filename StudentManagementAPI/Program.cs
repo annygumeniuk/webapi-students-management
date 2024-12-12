@@ -1,8 +1,10 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;  // to set up Swagger UI
 using StudentManagementAPI.Data; // to access data context
 using StudentManagementAPI.Repositories.Implementations;
 using StudentManagementAPI.Repositories.Interfaces;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +16,13 @@ builder.Services.AddEndpointsApiExplorer();
 // configuring Swagger
 builder.Services.AddSwaggerGen(c =>
     {
+        // Get the XML documentation file
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+        // Add the XML documentation to Swagger
+        c.IncludeXmlComments(xmlPath);
+
         // set info to display in UI
         c.SwaggerDoc("v1", new OpenApiInfo
         {

@@ -11,5 +11,6 @@ namespace StudentManagementAPI.Repositories.Interfaces
         Task UpdateAsync(T entity);
         Task DeleteAsync(object id);
         Task SaveAsync();
+        Task<bool> ExistsAsync(Expression<Func<T, bool>> predicate);
     }
 }

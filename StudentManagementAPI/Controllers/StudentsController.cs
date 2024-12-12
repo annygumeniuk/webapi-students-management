@@ -10,7 +10,8 @@ namespace StudentManagementAPI.Controllers
     [ApiController]
     public class StudentsController : BaseController<Student>
     {
-        public StudentsController(IRepository<Student> repository) : base(repository)
+        public StudentsController(IRepository<Student> repository, ILogger<BaseController<Student>> logger) 
+            : base(repository, logger)
         {
         }        
     }
