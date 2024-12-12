@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentManagementAPI.Data;
 using StudentManagementAPI.Models;
-using StudentManagementAPI.Repositories.Implementations;
 using StudentManagementAPI.Repositories.Interfaces;
 
 namespace StudentManagementAPI.Controllers
@@ -20,40 +19,31 @@ namespace StudentManagementAPI.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        public IActionResult GetStudent(int id)
+        public async Task<IActionResult> GetStudent(int id)
         { 
-            return Ok(_studentRepository.GetStudentById(id));
+            return Ok(await _studentRepository.GetByIdAsync(id));
         }
 
-        [HttpGet]       
-        public IActionResult GetStudents()
-        {
-            try
-            {
-                var students = _studentRepository.GetStudents();
-                return Ok(students);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
+        [HttpGet]
+        public async Task<IActionResult> GetAllStudents()
+        {            
+            return Ok(await _studentRepository.GetAllAsync());
         }
 
         [HttpPost]
-        public IActionResult AddStudent([FromBody] StudentHelper newStudent)
+        public async Task<IActionResult> AddStudent([FromBody] Student newStudent)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _studentRepository.AddStudent(newStudent);
+            await _studentRepository.AddAsync(newStudent);
             return Ok("Student added successfully.");
         }
 
-        [HttpPut]
-        [Route("{id}")]
-        public IActionResult UpdateStudent(int id, [FromBody] StudentHelper updatedStudent)
+        [HttpPut]        
+        public async Task<IActionResult> UpdateStudent([FromBody] Student updatedStudent)
         {
             if (!ModelState.IsValid)
             {
@@ -62,7 +52,7 @@ namespace StudentManagementAPI.Controllers
 
             try
             {
-                _studentRepository.UpdateStudent(id, updatedStudent);
+                await _studentRepository.UpdateAsync(updatedStudent);
                 return Ok("Student updated successfully.");
             }
             catch (KeyNotFoundException ex)
@@ -73,11 +63,11 @@ namespace StudentManagementAPI.Controllers
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteStudent(int id)
+        public async Task<IActionResult> DeleteStudent(int id)
         {
             try
             {
-                _studentRepository.DeleteStudent(id);
+                await _studentRepository.DeleteAsync(id);
                 return Ok("Student deleted successfully.");
             }
             catch (KeyNotFoundException ex)

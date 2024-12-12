@@ -1,33 +1,16 @@
-﻿using StudentManagementAPI.Models;
+﻿using StudentManagementAPI.Data;
+using StudentManagementAPI.Models;
 using StudentManagementAPI.Repositories.Interfaces;
 
 namespace StudentManagementAPI.Repositories.Implementations
 {
-    public class CourseRepository : ICourseRepository
+    public class CourseRepository : Repository<Course>, ICourseRepository
     {
-        public void AddCourse(CourseHelper course)
-        {
-            throw new NotImplementedException();
-        }
+        private readonly ApplicationDbContext _context;
 
-        public void DeleteCourse(int id)
+        public CourseRepository(ApplicationDbContext context) : base(context)
         {
-            throw new NotImplementedException();
-        }
-
-        public Course GetCourseById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<Course> GetCourses()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void UpdateCourse(int id, CourseHelper course)
-        {
-            throw new NotImplementedException();
-        }
+            _context = context;
+        }        
     }
 }
