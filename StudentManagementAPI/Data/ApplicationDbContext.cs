@@ -6,8 +6,8 @@ namespace StudentManagementAPI.Data
     public class ApplicationDbContext: DbContext
     {        
         // Creating a db sets of entities
-        public DbSet<Student> Students { get; set; } // A
-        public DbSet<Course>  Courses  { get; set; } // B
+        public DbSet<Student> Students { get; set; } // B
+        public DbSet<Course>  Courses  { get; set; } 
         public DbSet<Teacher> Teachers { get; set; } // C       
 
         // Configure the entity model and relationships
@@ -23,7 +23,7 @@ namespace StudentManagementAPI.Data
             modelBuilder.Entity<Course>()
                 .HasOne(t => t.Teacher)
                 .WithOne(c => c.Course)
-                .HasForeignKey<Teacher>(c => c.CourseId);
+                .HasForeignKey<Teacher>(c => c.CourseId);            
         }
 
         // Necessary for dependency injection to configure the db connection

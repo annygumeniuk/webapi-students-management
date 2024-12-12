@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentManagementAPI.Data;
 using StudentManagementAPI.Models;
+using StudentManagementAPI.Repositories.Implementations;
+using StudentManagementAPI.Repositories.Interfaces;
 
 namespace StudentManagementAPI.Controllers
 {
@@ -9,71 +11,79 @@ namespace StudentManagementAPI.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IStudentRepository _studentRepository;
 
-        public StudentsController(ApplicationDbContext context)
+        public StudentsController(IStudentRepository context)
         {
-            _context = context;
-        }
-
-        [HttpGet]
-        public IActionResult GetStudents()
-        {                                  
-            return Ok(_context.Students.ToList());           
+            _studentRepository = context;
         }
 
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetStudent(int id)
+        { 
+            return Ok(_studentRepository.GetStudentById(id));
+        }
+
+        [HttpGet]       
+        public IActionResult GetStudents()
         {
-            return Ok(_context.Students.Where(s => s.Id == id).ToList());
+            try
+            {
+                var students = _studentRepository.GetStudents();
+                return Ok(students);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost]
-        public IActionResult AddStudent(StudentCreateModel newStudent)
+        public IActionResult AddStudent([FromBody] StudentHelper newStudent)
         {
-            var student = new Student()
-            { 
-                Name = newStudent.Name,
-                Email = newStudent.Email,
-                Password = newStudent.Password,
-                Courses = newStudent.Courses,
-            };
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            _context.Students.Add(student);
-            _context.SaveChanges();
-
-            return Ok(student);
+            _studentRepository.AddStudent(newStudent);
+            return Ok("Student added successfully.");
         }
 
         [HttpPut]
         [Route("{id}")]
-        public IActionResult UpdateStudent(int id, StudentCreateModel student)
-        { 
-            var studentToChange = (Student)_context.Students.FirstOrDefault(s => s.Id == id);
-            if (studentToChange != null)
+        public IActionResult UpdateStudent(int id, [FromBody] StudentHelper updatedStudent)
+        {
+            if (!ModelState.IsValid)
             {
-                studentToChange.Name     = student.Name;
-                studentToChange.Email    = student.Email;
-                studentToChange.Password = student.Password;
-                studentToChange.Courses  = student.Courses;
-                _context.SaveChanges();
-                return Ok(studentToChange);
+                return BadRequest(ModelState);
             }
-            else
+
+            try
             {
-                return NotFound();
+                _studentRepository.UpdateStudent(id, updatedStudent);
+                return Ok("Student updated successfully.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
 
         [HttpDelete]
         [Route("{id}")]
         public IActionResult DeleteStudent(int id)
-        {                        
-            var student = _context.Students.FirstOrDefault(s => s.Id == id);
-            _context.Students.Remove(student);
-            _context.SaveChanges();
-            return Ok();                                    
-        }        
+        {
+            try
+            {
+                _studentRepository.DeleteStudent(id);
+                return Ok("Student deleted successfully.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
     }
 }

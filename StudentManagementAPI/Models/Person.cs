@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace StudentManagementAPI.Models
 {
-    public class StudentCreateModel
-    {        
+    public class Person
+    {       
         [Required(ErrorMessage = "This field is required")]
         public string Name { get; set; }
 
@@ -14,8 +15,5 @@ namespace StudentManagementAPI.Models
         [StringLength(100, MinimumLength = 6, ErrorMessage = "The minimun leght is 6")]
         [Required(ErrorMessage = "This field is required")]
         public string Password { get; set; }
-
-        // Navigation property: one-to-many 
-        public ICollection<Course>? Courses { get; set; }
-    }
+    }    
 }
