@@ -29,8 +29,19 @@ namespace StudentManagementAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var items = await _repository.GetAllAsync();
-            return Ok(items);
+            _logger.LogInformation("Entered GetAll method.");
+
+            try
+            {
+                var items = await _repository.GetAllAsync();
+                _logger.LogInformation("Successfully retrieved all items.");
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving all items.");
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         /// <summary>
@@ -45,11 +56,24 @@ namespace StudentManagementAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var item = await _repository.GetByIdAsync(id);
-            if (item == null)
-                return NotFound($"Item with ID {id} not found.");
+            _logger.LogInformation("Entered GetById method with id: {Id}.", id);
+            try
+            {
+                var item = await _repository.GetByIdAsync(id);
+                if (item == null)
+                {
+                    _logger.LogWarning("Item with ID {Id} not found.", id);
+                    return NotFound($"Item with ID {id} not found.");
+                }
 
-            return Ok(item);
+                _logger.LogInformation("Successfully retrieved item with ID {Id}.", id);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving item with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
+            }
         }
 
         /// <summary>
@@ -63,12 +87,26 @@ namespace StudentManagementAPI.Controllers
         [HttpPost]
         public async Task<IActionResult> Add([FromBody] T item)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-                 
-            await _repository.AddAsync(item);
-            await _repository.SaveAsync();
-            return Ok("Item added successfully.");
+            _logger.LogInformation("Entered Add method.");
+
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("Model state is invalid.");
+                    return BadRequest(ModelState);
+                }
+
+                await _repository.AddAsync(item);
+                await _repository.SaveAsync();
+                _logger.LogInformation("Item added successfully.");
+                return Ok("Item added successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while adding a new item.");
+                return StatusCode(500, "Internal server error");
+            }           
         }
 
         /// <summary>
@@ -82,12 +120,25 @@ namespace StudentManagementAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] T item)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);            
+            _logger.LogInformation("Entered Update method.");
+            try 
+            {
+                if (!ModelState.IsValid)
+                {
+                    _logger.LogWarning("Model state is invalid.");
+                    return BadRequest(ModelState);
+                }                   
 
-            await _repository.UpdateAsync(item);
-            await _repository.SaveAsync();
-            return Ok("Item updated successfully.");
+                await _repository.UpdateAsync(item);
+                await _repository.SaveAsync();
+                _logger.LogInformation("Item updated successfully.");
+                return Ok("Item updated successfully.");
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "An error occurred while updating item.");
+                return StatusCode(500, "Internal server error");
+            }            
         }
 
         /// <summary>
@@ -101,13 +152,27 @@ namespace StudentManagementAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var existingItem = await _repository.GetByIdAsync(id);
-            if (existingItem == null)
-                return NotFound($"Item with ID {id} not found.");
+            _logger.LogInformation("Entered Delete method with ID {Id}.", id);
 
-            await _repository.DeleteAsync(id);
-            await _repository.SaveAsync();
-            return Ok("Item deleted successfully.");
+            try
+            {
+                var existingItem = await _repository.GetByIdAsync(id);
+                if (existingItem == null)
+                {
+                    _logger.LogWarning("Item with ID {Id} not found.", id);
+                    return NotFound($"Item with ID {id} not found.");
+                }                
+
+                await _repository.DeleteAsync(id);
+                await _repository.SaveAsync();
+                _logger.LogInformation("Successfully deleted item with ID {Id}.", id);
+                return Ok("Item deleted successfully.");
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "An error occurred while deleting item with ID {Id}.", id);
+                return StatusCode(500, "Internal server error");
+            }           
         }
     }
 }
